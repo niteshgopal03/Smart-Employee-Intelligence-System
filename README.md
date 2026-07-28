@@ -6,4 +6,4 @@ An AI-powered HR Management System built using:
 - FastAPI
 - MySQL
 - Streamlit
-- Scikit-learn
+- Scikit-learn 
