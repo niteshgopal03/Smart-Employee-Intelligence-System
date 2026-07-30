@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from routes.employee import router as employee_router
 from routes.auth import router as auth_router
+from routes.attendance import router as attendance_router
 
 app = FastAPI(
     title="Smart Employee Intelligence System API",
@@ -26,3 +27,4 @@ def health_check():
 
 app.include_router(employee_router)
 app.include_router(auth_router)
+app.include_router(attendance_router)

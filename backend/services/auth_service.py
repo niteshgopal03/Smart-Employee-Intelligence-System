@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from database import connection
 from models.employee import Login
 from security.password import verify_password
+from security.jwt_handler import create_access_token
 
 
 def login_service(login_data: Login):
@@ -20,6 +21,7 @@ def login_service(login_data: Login):
     user = cursor.fetchone()
 
     if user is None:
+
         cursor.close()
 
         raise HTTPException(
@@ -39,10 +41,19 @@ def login_service(login_data: Login):
             detail="Invalid password"
         )
 
+    access_token = create_access_token(
+        {
+            "employee_id": user["employee_id"],
+            "role": user["role"]
+        }
+    )
+
     cursor.close()
 
     return {
         "message": "Login Successful",
+        "access_token": access_token,
+        "token_type": "Bearer",
         "role": user["role"],
         "employee_id": user["employee_id"]
     }
