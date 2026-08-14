@@ -1,23 +1,29 @@
-from fastapi import Header, HTTPException
+from fastapi import Depends, HTTPException
+
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
 from security.jwt_handler import verify_access_token
 
+security = HTTPBearer()
 
-def get_current_user(authorization: str = Header(None)):
 
-    if authorization is None:
+def get_current_user(
+
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+
+):
+
+    token = credentials.credentials
+
+    try:
+
+        payload = verify_access_token(token)
+
+        return payload
+
+    except Exception:
+
         raise HTTPException(
             status_code=401,
-            detail="Authorization header missing"
+            detail="Invalid or Expired Token"
         )
-
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authorization format"
-        )
-
-    token = authorization.split(" ")[1]
-
-    payload = verify_access_token(token)
-
-    return payload
