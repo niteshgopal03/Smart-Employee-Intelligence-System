@@ -7,12 +7,6 @@ def generate_employee_id(department_id: int):
 
     cursor = connection.cursor()
 
-    # Department 1 -> EMP1001
-    # Department 2 -> EMP2001
-    # Department 3 -> EMP3001
-    # Department 4 -> EMP4001
-    # Department 5 -> EMP5001
-
     prefix = f"EMP{department_id}"
 
     cursor.execute("""
@@ -30,25 +24,21 @@ def generate_employee_id(department_id: int):
     else:
         last_id = result[0]
 
-        # EMP1001 -> 1001
         number = int(last_id[3:])
 
-        # EMP1001 -> EMP1002
         employee_id = f"EMP{number + 1}"
 
     cursor.close()
 
     return employee_id
 
-# ======================================================
-# Add Employee
-# ======================================================
+
 
 def add_employee_service(employee):
 
     cursor = connection.cursor(dictionary=True)
 
-    # Check department
+  
     cursor.execute("""
         SELECT department_id, department_name
         FROM departments
@@ -63,10 +53,9 @@ def add_employee_service(employee):
             "message": "Department not found"
         }
 
-    # Generate employee ID
     employee_id = generate_employee_id(employee.department_id)
 
-    # Insert employee
+   
     cursor.execute("""
         INSERT INTO employees (
             employee_id,
@@ -103,7 +92,7 @@ def add_employee_service(employee):
         employee.base_salary
     ))
 
-    # Employee login
+    
     default_password = "Welcome@123"
     password_hash = hash_password(default_password)
 
@@ -137,9 +126,6 @@ def add_employee_service(employee):
     }
 
 
-# ======================================================
-# Get All Employees
-# ======================================================
 
 def get_all_employees_service():
 
@@ -159,9 +145,6 @@ def get_all_employees_service():
     return employees
 
 
-# ======================================================
-# Get Employee
-# ======================================================
 
 def get_employee_service(employee_id: str):
 
@@ -185,9 +168,7 @@ def get_employee_service(employee_id: str):
         }
 
     return employee
-# ======================================================
-# Update Employee
-# ======================================================
+
 
 def update_employee_service(employee_id: str, employee: Employee):
 
@@ -250,10 +231,6 @@ def update_employee_service(employee_id: str, employee: Employee):
     }
 
 
-# ======================================================
-# Delete Employee (Soft Delete)
-# ======================================================
-
 def delete_employee_service(employee_id: str):
 
     cursor = connection.cursor(dictionary=True)
@@ -279,14 +256,14 @@ def delete_employee_service(employee_id: str):
             "message": "Employee is already resigned"
         }
 
-    # Mark employee as resigned
+
     cursor.execute("""
         UPDATE employees
         SET status = 'Resigned'
         WHERE employee_id = %s
     """, (employee_id,))
 
-    # Disable employee login
+    
     cursor.execute("""
         UPDATE users
         SET status = 'Inactive'

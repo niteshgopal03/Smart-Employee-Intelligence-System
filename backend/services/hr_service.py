@@ -6,7 +6,6 @@ def generate_hr_id(department_id: int):
 
     cursor = connection.cursor()
 
-    # Check whether this department already has an HR
     cursor.execute("""
         SELECT employee_id
         FROM employees
@@ -21,9 +20,6 @@ def generate_hr_id(department_id: int):
         cursor.close()
         return None
 
-    # Department 1 -> HR1001
-    # Department 2 -> HR2001
-    # Department 3 -> HR3001
     hr_id = f"HR{department_id}001"
 
     cursor.close()
@@ -35,7 +31,6 @@ def add_hr_service(hr):
 
     cursor = connection.cursor(dictionary=True)
 
-    # Check department exists
     cursor.execute("""
         SELECT department_id, department_name
         FROM departments
@@ -50,7 +45,7 @@ def add_hr_service(hr):
             "message": "Department not found"
         }
 
-    # Check if department already has HR
+
     cursor.execute("""
         SELECT employee_id
         FROM employees
@@ -68,10 +63,9 @@ def add_hr_service(hr):
             "hr_id": existing_hr["employee_id"]
         }
 
-    # Generate department-based HR ID
     hr_id = f"HR{hr.department_id}001"
 
-    # Check whether this ID already exists
+    
     cursor.execute("""
         SELECT employee_id
         FROM employees
@@ -86,7 +80,6 @@ def add_hr_service(hr):
             "message": f"HR ID {hr_id} already exists"
         }
 
-    # Insert HR into employees
     cursor.execute("""
         INSERT INTO employees (
             employee_id,
@@ -123,11 +116,11 @@ def add_hr_service(hr):
         hr.base_salary
     ))
 
-    # Generate default password
+    
     default_password = "Welcome@123"
     password_hash = hash_password(default_password)
 
-    # Create HR login
+    
     cursor.execute("""
         INSERT INTO users (
             username,
@@ -162,7 +155,7 @@ def delete_hr_service(employee_id: str):
 
     cursor = connection.cursor(dictionary=True)
 
-    # Check HR
+    
     cursor.execute("""
         SELECT employee_id, department_id
         FROM employees
@@ -180,15 +173,14 @@ def delete_hr_service(employee_id: str):
 
     department_id = hr["department_id"]
 
-    # Delete HR login first
+    
     cursor.execute("""
         DELETE FROM users
         WHERE employee_id = %s
         AND role = 'HR'
     """, (employee_id,))
 
-    # Delete only the HR employee record
-    # Employees belonging to the department remain untouched.
+
     cursor.execute("""
         DELETE FROM employees
         WHERE employee_id = %s
