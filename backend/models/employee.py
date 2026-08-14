@@ -1,26 +1,28 @@
-
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from datetime import date
 
 
 class Employee(BaseModel):
+
     first_name: str
     last_name: str
-    email: EmailStr
+
+    email: str
+
     phone: str
+
     gender: str
+
     dob: date
+
     joining_date: date
+
     department_id: int
+
     designation: str
+
     education: str
+
     skills: str
+
     base_salary: float
-    manager_rating: float
-    attendance_percentage: float
-    leave_balance: int
-
-
-class Login(BaseModel):
-    username: str
-    password: str

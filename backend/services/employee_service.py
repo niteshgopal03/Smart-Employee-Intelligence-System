@@ -3,19 +3,72 @@ from models.employee import Employee
 from security.password import hash_password
 
 
-def add_employee_service(employee: Employee):
+def generate_employee_id(department_id: int):
 
     cursor = connection.cursor()
 
-    # Generate Employee ID 
-    cursor.execute("SELECT COUNT(*) FROM employees")
-    count = cursor.fetchone()[0]
-    employee_id = f"EMP{1001 + count}"
+    # Department 1 -> EMP1001
+    # Department 2 -> EMP2001
+    # Department 3 -> EMP3001
+    # Department 4 -> EMP4001
+    # Department 5 -> EMP5001
 
-    cursor.execute(
-        """
-        INSERT INTO employees
-        (
+    prefix = f"EMP{department_id}"
+
+    cursor.execute("""
+        SELECT employee_id
+        FROM employees
+        WHERE employee_id LIKE %s
+        ORDER BY CAST(SUBSTRING(employee_id, 5) AS UNSIGNED) DESC
+        LIMIT 1
+    """, (prefix + "%",))
+
+    result = cursor.fetchone()
+
+    if not result:
+        employee_id = f"{prefix}001"
+    else:
+        last_id = result[0]
+
+        # EMP1001 -> 1001
+        number = int(last_id[3:])
+
+        # EMP1001 -> EMP1002
+        employee_id = f"EMP{number + 1}"
+
+    cursor.close()
+
+    return employee_id
+
+# ======================================================
+# Add Employee
+# ======================================================
+
+def add_employee_service(employee):
+
+    cursor = connection.cursor(dictionary=True)
+
+    # Check department
+    cursor.execute("""
+        SELECT department_id, department_name
+        FROM departments
+        WHERE department_id = %s
+    """, (employee.department_id,))
+
+    department = cursor.fetchone()
+
+    if not department:
+        cursor.close()
+        return {
+            "message": "Department not found"
+        }
+
+    # Generate employee ID
+    employee_id = generate_employee_id(employee.department_id)
+
+    # Insert employee
+    cursor.execute("""
+        INSERT INTO employees (
             employee_id,
             first_name,
             last_name,
@@ -29,83 +82,75 @@ def add_employee_service(employee: Employee):
             education,
             skills,
             base_salary,
-            manager_rating,
-            attendance_percentage,
-            leave_balance,
             status
         )
-
-        VALUES
-        (
-            %s,%s,%s,%s,%s,%s,%s,%s,
-            %s,%s,%s,%s,%s,%s,%s,%s,%s
+        VALUES (
+            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'Active'
         )
-        """,
-        (
-            employee_id,
-            employee.first_name,
-            employee.last_name,
-            employee.email,
-            employee.phone,
-            employee.gender,
-            employee.dob,
-            employee.joining_date,
-            employee.department_id,
-            employee.designation,
-            employee.education,
-            employee.skills,
-            employee.base_salary,
-            employee.manager_rating,
-            employee.attendance_percentage,
-            employee.leave_balance,
-            "Active"
-        )
-    )
+    """, (
+        employee_id,
+        employee.first_name,
+        employee.last_name,
+        employee.email,
+        employee.phone,
+        employee.gender,
+        employee.dob,
+        employee.joining_date,
+        employee.department_id,
+        employee.designation,
+        employee.education,
+        employee.skills,
+        employee.base_salary
+    ))
 
+    # Employee login
     default_password = "Welcome@123"
+    password_hash = hash_password(default_password)
 
-    hashed_password = hash_password(default_password)
-
-    cursor.execute(
-        """
-        INSERT INTO users
-        (
+    cursor.execute("""
+        INSERT INTO users (
             username,
             password_hash,
             role,
-            employee_id
-        )
-
-        VALUES(%s,%s,%s,%s)
-        """,
-        (
             employee_id,
-            hashed_password,
-            "Employee",
-            employee_id
+            status
         )
-    )
+        VALUES (
+            %s, %s, 'Employee', %s, 'Active'
+        )
+    """, (
+        employee_id,
+        password_hash,
+        employee_id
+    ))
 
     connection.commit()
     cursor.close()
 
     return {
         "message": "Employee added successfully",
-        "employee_id": employee_id
+        "employee_id": employee_id,
+        "username": employee_id,
+        "temporary_password": default_password,
+        "department_id": employee.department_id,
+        "department_name": department["department_name"]
     }
 
+
+# ======================================================
+# Get All Employees
+# ======================================================
 
 def get_all_employees_service():
 
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT *
         FROM employees
         WHERE status='Active'
-        """
-    )
+        ORDER BY employee_id
+    """)
 
     employees = cursor.fetchall()
 
@@ -114,100 +159,147 @@ def get_all_employees_service():
     return employees
 
 
+# ======================================================
+# Get Employee
+# ======================================================
+
 def get_employee_service(employee_id: str):
 
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT *
         FROM employees
         WHERE employee_id=%s
-        """,
-        (employee_id,)
+    """,
+    (employee_id,)
     )
 
     employee = cursor.fetchone()
 
     cursor.close()
 
-    return employee
+    if employee is None:
+        return {
+            "message": "Employee Not Found"
+        }
 
+    return employee
+# ======================================================
+# Update Employee
+# ======================================================
 
 def update_employee_service(employee_id: str, employee: Employee):
 
-    cursor = connection.cursor()
+    cursor = connection.cursor(dictionary=True)
 
-    cursor.execute(
-        """
-        UPDATE employees
-        SET
-            first_name=%s,
-            last_name=%s,
-            email=%s,
-            phone=%s,
-            gender=%s,
-            dob=%s,
-            joining_date=%s,
-            department_id=%s,
-            designation=%s,
-            education=%s,
-            skills=%s,
-            base_salary=%s,
-            manager_rating=%s,
-            attendance_percentage=%s,
-            leave_balance=%s
+    cursor.execute("""
+        SELECT *
+        FROM employees
         WHERE employee_id=%s
-        """,
-        (
-            employee.first_name,
-            employee.last_name,
-            employee.email,
-            employee.phone,
-            employee.gender,
-            employee.dob,
-            employee.joining_date,
-            employee.department_id,
-            employee.designation,
-            employee.education,
-            employee.skills,
-            employee.base_salary,
-            employee.manager_rating,
-            employee.attendance_percentage,
-            employee.leave_balance,
-            employee_id
-        )
+    """,
+    (employee_id,)
     )
+
+    existing_employee = cursor.fetchone()
+
+    if existing_employee is None:
+
+        cursor.close()
+
+        return {
+            "message": "Employee Not Found"
+        }
+
+    cursor.execute("""
+        UPDATE employees
+
+        SET
+
+        first_name=%s,
+        last_name=%s,
+        email=%s,
+        phone=%s,
+        department_id=%s,
+        designation=%s,
+        education=%s,
+        skills=%s,
+        base_salary=%s
+
+        WHERE employee_id=%s
+    """,
+    (
+        employee.first_name,
+        employee.last_name,
+        employee.email,
+        employee.phone,
+        employee.department_id,
+        employee.designation,
+        employee.education,
+        employee.skills,
+        employee.base_salary,
+        employee_id
+    ))
 
     connection.commit()
 
     cursor.close()
 
     return {
-        "message": "Employee updated successfully"
+        "message": "Employee Updated Successfully"
     }
 
 
+# ======================================================
+# Delete Employee (Soft Delete)
+# ======================================================
+
 def delete_employee_service(employee_id: str):
 
-    cursor = connection.cursor()
+    cursor = connection.cursor(dictionary=True)
 
-    cursor.execute(
-        """
+    # Check employee exists
+    cursor.execute("""
+        SELECT employee_id, status
+        FROM employees
+        WHERE employee_id = %s
+    """, (employee_id,))
+
+    employee = cursor.fetchone()
+
+    if not employee:
+        cursor.close()
+        return {
+            "message": "Employee not found"
+        }
+
+    if employee["status"] == "Resigned":
+        cursor.close()
+        return {
+            "message": "Employee is already resigned"
+        }
+
+    # Mark employee as resigned
+    cursor.execute("""
         UPDATE employees
-        SET status=%s
-        WHERE employee_id=%s
-        """,
-        (
-            "Resigned",
-            employee_id
-        )
-    )
+        SET status = 'Resigned'
+        WHERE employee_id = %s
+    """, (employee_id,))
+
+    # Disable employee login
+    cursor.execute("""
+        UPDATE users
+        SET status = 'Inactive'
+        WHERE employee_id = %s
+        AND role = 'Employee'
+    """, (employee_id,))
 
     connection.commit()
-
     cursor.close()
 
     return {
-        "message": "Employee marked as resigned successfully"
+        "message": "Employee deleted successfully",
+        "employee_id": employee_id,
+        "status": "Resigned",
+        "login_status": "Inactive"
     }
