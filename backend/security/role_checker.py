@@ -5,13 +5,27 @@ from security.auth_dependency import get_current_user
 
 def require_role(*roles):
 
-    def role_dependency(current_user=Depends(get_current_user)):
+    allowed_roles = {
+        str(role).strip().lower()
+        for role in roles
+    }
 
-        if current_user["role"] not in roles:
+    def role_dependency(
+        current_user=Depends(get_current_user)
+    ):
 
+        user_role = str(
+            current_user.get("role", "")
+        ).strip().lower()
+
+        if user_role not in allowed_roles:
             raise HTTPException(
                 status_code=403,
-                detail="Access Denied"
+                detail={
+                    "message": "Access Denied",
+                    "jwt_role": current_user.get("role"),
+                    "allowed_roles": list(allowed_roles)
+                }
             )
 
         return current_user

@@ -280,3 +280,77 @@ def delete_employee_service(employee_id: str):
         "status": "Resigned",
         "login_status": "Inactive"
     }
+
+def get_my_employee_service(employee_id: str):
+
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            employee_id,
+            first_name,
+            last_name,
+            email,
+            phone,
+            gender,
+            dob,
+            joining_date,
+            department_id,
+            designation,
+            education,
+            skills,
+            base_salary,
+            manager_rating,
+            attendance_percentage,
+            leave_balance,
+            status
+        FROM employees
+        WHERE employee_id = %s
+    """, (employee_id,))
+
+    employee = cursor.fetchone()
+
+    cursor.close()
+
+    if employee is None:
+        return {
+            "message": "Employee profile not found"
+        }
+
+    return employee
+
+
+def search_employees_service(search: str):
+
+    cursor = connection.cursor(dictionary=True)
+
+    search_value = f"%{search}%"
+
+    cursor.execute("""
+        SELECT
+            employee_id,
+            first_name,
+            last_name,
+            email,
+            phone,
+            department_id,
+            designation,
+            status
+        FROM employees
+        WHERE employee_id LIKE %s
+           OR first_name LIKE %s
+           OR last_name LIKE %s
+           OR email LIKE %s
+        ORDER BY first_name ASC, last_name ASC
+    """, (
+        search_value,
+        search_value,
+        search_value,
+        search_value
+    ))
+
+    employees = cursor.fetchall()
+
+    cursor.close()
+
+    return employees
