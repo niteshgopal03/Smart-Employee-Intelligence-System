@@ -30,18 +30,24 @@ def apply_global_styles():
             padding-bottom: 3rem;
         }
 
+        /* Streamlit's own top toolbar (hamburger menu / status icon) —
+           make it blend into the app background instead of showing
+           as a solid black bar, and keep its icons visible on dark. */
+        [data-testid="stHeader"] {
+            background: transparent !important;
+            background-color: rgba(0, 0, 0, 0) !important;
+        }
 
-        /* Hide Streamlit heading link/anchor icons */
-        [data-testid="stHeaderActionElements"] {
-        display: none !important;
+        [data-testid="stHeader"] * {
+            color: #eaf2fb !important;
+            fill: #eaf2fb !important;
         }
-        
-        a.header-anchor-link {
-        display: none !important;
+
+        [data-testid="stToolbar"] {
+            background: transparent !important;
         }
-        [data-testid="stMarkdownContainer"] a[href^="#"] {
-        display: none !important;
-        }
+
+
         /* =====================================================
            TEXT
            ===================================================== */
