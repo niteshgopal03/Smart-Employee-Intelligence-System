@@ -1,12 +1,18 @@
 import mysql.connector
 
-connection = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="Root@2004",
-    database="employee_intelligence_system"
-)
+try:
 
-cursor = connection.cursor()
+    connection = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="Root@2004",
+        database="employee_intelligence_system"
+    )
 
-print("Database Connected Successfully")
+    if connection.is_connected():
+
+        print("Database Connected Successfully")
+
+except mysql.connector.Error as e:
+
+    print("Database Connection Error :", e)

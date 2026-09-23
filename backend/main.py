@@ -9,6 +9,7 @@ from routes.password import router as password_router
 from routes.performance import router as performance_router
 from routes.ai import router as ai_router
 from routes.admin_dashboard import router as admin_dashboard_router
+from routes.admin_hr import router as admin_hr_router
 
 
 app = FastAPI(
@@ -25,6 +26,7 @@ app.include_router(password_router)
 app.include_router(performance_router)
 app.include_router(ai_router)
 app.include_router(admin_dashboard_router)
+app.include_router(admin_hr_router)
 
 @app.get("/")
 def home():

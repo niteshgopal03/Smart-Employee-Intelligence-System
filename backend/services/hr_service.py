@@ -1,12 +1,16 @@
 from database import connection
 from security.password import hash_password
+from fastapi import HTTPException
 
+
+# ============================================================
+# HR ID GENERATION
+# ============================================================
 
 def generate_hr_id(department_id: int):
 
     cursor = connection.cursor()
 
-    # Check whether this department already has HR
     cursor.execute("""
         SELECT employee_id
         FROM employees
@@ -21,7 +25,6 @@ def generate_hr_id(department_id: int):
         cursor.close()
         return None
 
-
     hr_id = f"HR{department_id}001"
 
     cursor.close()
@@ -33,7 +36,6 @@ def add_hr_service(hr):
 
     cursor = connection.cursor(dictionary=True)
 
-    # Check department exists
     cursor.execute("""
         SELECT department_id, department_name
         FROM departments
@@ -48,7 +50,6 @@ def add_hr_service(hr):
             "message": "Department not found"
         }
 
-    
     cursor.execute("""
         SELECT employee_id
         FROM employees
@@ -66,7 +67,6 @@ def add_hr_service(hr):
             "hr_id": existing_hr["employee_id"]
         }
 
-    # Generate department-based HR ID
     hr_id = f"HR{hr.department_id}001"
 
     cursor.execute("""
@@ -83,7 +83,6 @@ def add_hr_service(hr):
             "message": f"HR ID {hr_id} already exists"
         }
 
-    # Insert HR into employees
     cursor.execute("""
         INSERT INTO employees (
             employee_id,
@@ -102,7 +101,8 @@ def add_hr_service(hr):
             status
         )
         VALUES (
-            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'Active'
+            %s, %s, %s, %s, %s, %s, %s, %s,
+            %s, %s, %s, %s, %s, 'Active'
         )
     """, (
         hr_id,
@@ -123,7 +123,6 @@ def add_hr_service(hr):
     default_password = "Welcome@123"
     password_hash = hash_password(default_password)
 
-    # Create HR login
     cursor.execute("""
         INSERT INTO users (
             username,
@@ -158,7 +157,6 @@ def delete_hr_service(employee_id: str):
 
     cursor = connection.cursor(dictionary=True)
 
-    # Check HR
     cursor.execute("""
         SELECT employee_id, department_id
         FROM employees
@@ -176,14 +174,12 @@ def delete_hr_service(employee_id: str):
 
     department_id = hr["department_id"]
 
-    # Delete HR login first
     cursor.execute("""
         DELETE FROM users
         WHERE employee_id = %s
         AND role = 'HR'
     """, (employee_id,))
 
-    # Delete only the HR employee record
     cursor.execute("""
         DELETE FROM employees
         WHERE employee_id = %s
@@ -201,19 +197,52 @@ def delete_hr_service(employee_id: str):
     }
 
 
-#TOTAL DASHBOARD
 
-def get_employee_report_service():
+
+def get_employee_report_service(department_id=None):
 
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT
-            COUNT(*) AS total_employees,
-            SUM(CASE WHEN status = 'Active' THEN 1 ELSE 0 END) AS active_employees,
-            SUM(CASE WHEN status = 'Resigned' THEN 1 ELSE 0 END) AS resigned_employees
-        FROM employees
-    """)
+    if department_id is None:
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total_employees,
+                SUM(
+                    CASE
+                        WHEN status = 'Active' THEN 1
+                        ELSE 0
+                    END
+                ) AS active_employees,
+                SUM(
+                    CASE
+                        WHEN status = 'Resigned' THEN 1
+                        ELSE 0
+                    END
+                ) AS resigned_employees
+            FROM employees
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total_employees,
+                SUM(
+                    CASE
+                        WHEN status = 'Active' THEN 1
+                        ELSE 0
+                    END
+                ) AS active_employees,
+                SUM(
+                    CASE
+                        WHEN status = 'Resigned' THEN 1
+                        ELSE 0
+                    END
+                ) AS resigned_employees
+            FROM employees
+            WHERE department_id = %s
+        """, (department_id,))
 
     summary = cursor.fetchone()
 
@@ -226,47 +255,82 @@ def get_employee_report_service():
     }
 
 
-def get_department_report_service():
+
+
+def get_department_report_service(department_id=None):
 
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT
-            d.department_id,
-            d.department_name,
-            COUNT(e.employee_id) AS total_employees,
-            SUM(
-                CASE
-                    WHEN e.status = 'Active' THEN 1
-                    ELSE 0
-                END
-            ) AS active_employees,
-            SUM(
-                CASE
-                    WHEN e.status = 'Resigned' THEN 1
-                    ELSE 0
-                END
-            ) AS resigned_employees
-        FROM departments d
-        LEFT JOIN employees e
-            ON d.department_id = e.department_id
-        GROUP BY
-            d.department_id,
-            d.department_name
-        ORDER BY d.department_name ASC
-    """)
+    if department_id is None:
+
+        cursor.execute("""
+            SELECT
+                d.department_id,
+                d.department_name,
+                COUNT(e.employee_id) AS total_employees,
+                SUM(
+                    CASE
+                        WHEN e.status = 'Active' THEN 1
+                        ELSE 0
+                    END
+                ) AS active_employees,
+                SUM(
+                    CASE
+                        WHEN e.status = 'Resigned' THEN 1
+                        ELSE 0
+                    END
+                ) AS resigned_employees
+            FROM departments d
+            LEFT JOIN employees e
+                ON d.department_id = e.department_id
+            GROUP BY
+                d.department_id,
+                d.department_name
+            ORDER BY d.department_name ASC
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                d.department_id,
+                d.department_name,
+                COUNT(e.employee_id) AS total_employees,
+                SUM(
+                    CASE
+                        WHEN e.status = 'Active' THEN 1
+                        ELSE 0
+                    END
+                ) AS active_employees,
+                SUM(
+                    CASE
+                        WHEN e.status = 'Resigned' THEN 1
+                        ELSE 0
+                    END
+                ) AS resigned_employees
+            FROM departments d
+            LEFT JOIN employees e
+                ON d.department_id = e.department_id
+            WHERE d.department_id = %s
+            GROUP BY
+                d.department_id,
+                d.department_name
+        """, (department_id,))
 
     departments = cursor.fetchall()
 
     cursor.close()
 
     for department in departments:
+
         department["total_employees"] = (
             department["total_employees"] or 0
         )
+
         department["active_employees"] = (
             department["active_employees"] or 0
         )
+
         department["resigned_employees"] = (
             department["resigned_employees"] or 0
         )
@@ -276,100 +340,213 @@ def get_department_report_service():
     }
 
 
-def get_attendance_report_service():
+
+def get_attendance_report_service(department_id=None):
 
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT
-            COUNT(*) AS total_records,
-            SUM(
-                CASE
-                    WHEN status = 'Present' THEN 1
-                    ELSE 0
-                END
-            ) AS present,
-            SUM(
-                CASE
-                    WHEN status = 'Absent' THEN 1
-                    ELSE 0
-                END
-            ) AS absent,
-            SUM(
-                CASE
-                    WHEN status = 'Leave' THEN 1
-                    ELSE 0
-                END
-            ) AS leave
-        FROM attendance
-    """)
+    if department_id is None:
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total_records,
+
+                SUM(
+                    CASE
+                        WHEN a.status = 'Present' THEN 1
+                        ELSE 0
+                    END
+                ) AS present_count,
+
+                SUM(
+                    CASE
+                        WHEN a.status = 'Absent' THEN 1
+                        ELSE 0
+                    END
+                ) AS absent_count,
+
+                SUM(
+                    CASE
+                        WHEN a.status = 'Leave' THEN 1
+                        ELSE 0
+                    END
+                ) AS leave_count
+
+            FROM attendance a
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total_records,
+
+                SUM(
+                    CASE
+                        WHEN a.status = 'Present' THEN 1
+                        ELSE 0
+                    END
+                ) AS present_count,
+
+                SUM(
+                    CASE
+                        WHEN a.status = 'Absent' THEN 1
+                        ELSE 0
+                    END
+                ) AS absent_count,
+
+                SUM(
+                    CASE
+                        WHEN a.status = 'Leave' THEN 1
+                        ELSE 0
+                    END
+                ) AS leave_count
+
+            FROM attendance a
+
+            INNER JOIN employees e
+                ON a.employee_id = e.employee_id
+
+            WHERE e.department_id = %s
+        """, (department_id,))
 
     summary = cursor.fetchone()
 
     cursor.close()
 
     total_records = summary["total_records"] or 0
-    present = summary["present"] or 0
+    present = summary["present_count"] or 0
+    absent = summary["absent_count"] or 0
+    leave = summary["leave_count"] or 0
 
     if total_records > 0:
+
         attendance_percentage = round(
             (present / total_records) * 100,
             2
         )
+
     else:
+
         attendance_percentage = 0
 
     return {
         "total_records": total_records,
         "present": present,
-        "absent": summary["absent"] or 0,
-        "leave": summary["leave"] or 0,
+        "absent": absent,
+        "leave": leave,
         "attendance_percentage": attendance_percentage
     }
 
 
-def get_leave_report_service():
+
+
+def get_leave_report_service(department_id=None):
 
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT
-            COUNT(*) AS total_requests,
-            SUM(
-                CASE
-                    WHEN status = 'Pending' THEN 1
-                    ELSE 0
-                END
-            ) AS pending,
-            SUM(
-                CASE
-                    WHEN status = 'Approved' THEN 1
-                    ELSE 0
-                END
-            ) AS approved,
-            SUM(
-                CASE
-                    WHEN status = 'Rejected' THEN 1
-                    ELSE 0
-                END
-            ) AS rejected
-        FROM leave_requests
-    """)
+    if department_id is None:
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total_requests,
+
+                SUM(
+                    CASE
+                        WHEN status = 'Pending' THEN 1
+                        ELSE 0
+                    END
+                ) AS pending,
+
+                SUM(
+                    CASE
+                        WHEN status = 'Approved' THEN 1
+                        ELSE 0
+                    END
+                ) AS approved,
+
+                SUM(
+                    CASE
+                        WHEN status = 'Rejected' THEN 1
+                        ELSE 0
+                    END
+                ) AS rejected
+
+            FROM leave_requests
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS total_requests,
+
+                SUM(
+                    CASE
+                        WHEN lr.status = 'Pending' THEN 1
+                        ELSE 0
+                    END
+                ) AS pending,
+
+                SUM(
+                    CASE
+                        WHEN lr.status = 'Approved' THEN 1
+                        ELSE 0
+                    END
+                ) AS approved,
+
+                SUM(
+                    CASE
+                        WHEN lr.status = 'Rejected' THEN 1
+                        ELSE 0
+                    END
+                ) AS rejected
+
+            FROM leave_requests lr
+
+            INNER JOIN employees e
+                ON lr.employee_id = e.employee_id
+
+            WHERE e.department_id = %s
+        """, (department_id,))
 
     summary = cursor.fetchone()
 
-    cursor.execute("""
-        SELECT
-            COUNT(*) AS approved_requests,
-            COALESCE(
-                SUM(
-                    DATEDIFF(to_date, from_date) + 1
-                ),
-                0
-            ) AS approved_leave_days
-        FROM leave_requests
-        WHERE status = 'Approved'
-    """)
+    if department_id is None:
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS approved_requests,
+                COALESCE(
+                    SUM(
+                        DATEDIFF(to_date, from_date) + 1
+                    ),
+                    0
+                ) AS approved_leave_days
+            FROM leave_requests
+            WHERE status = 'Approved'
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                COUNT(*) AS approved_requests,
+                COALESCE(
+                    SUM(
+                        DATEDIFF(lr.to_date, lr.from_date) + 1
+                    ),
+                    0
+                ) AS approved_leave_days
+
+            FROM leave_requests lr
+
+            INNER JOIN employees e
+                ON lr.employee_id = e.employee_id
+
+            WHERE lr.status = 'Approved'
+            AND e.department_id = %s
+        """, (department_id,))
 
     approved_summary = cursor.fetchone()
 
@@ -386,37 +563,74 @@ def get_leave_report_service():
     }
 
 
-def get_performance_report_service():
+
+def get_performance_report_service(department_id=None):
 
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT
-            COUNT(manager_rating) AS rated_employees,
-            ROUND(AVG(manager_rating), 2) AS average_rating,
-            MAX(manager_rating) AS highest_rating,
-            MIN(manager_rating) AS lowest_rating
-        FROM employees
-        WHERE manager_rating IS NOT NULL
-    """)
+    if department_id is None:
+
+        cursor.execute("""
+            SELECT
+                COUNT(manager_rating) AS rated_employees,
+                ROUND(AVG(manager_rating), 2) AS average_rating,
+                MAX(manager_rating) AS highest_rating,
+                MIN(manager_rating) AS lowest_rating
+            FROM employees
+            WHERE manager_rating IS NOT NULL
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                COUNT(manager_rating) AS rated_employees,
+                ROUND(AVG(manager_rating), 2) AS average_rating,
+                MAX(manager_rating) AS highest_rating,
+                MIN(manager_rating) AS lowest_rating
+            FROM employees
+            WHERE manager_rating IS NOT NULL
+            AND department_id = %s
+        """, (department_id,))
 
     summary = cursor.fetchone()
 
-    cursor.execute("""
-        SELECT
-            e.department_id,
-            d.department_name,
-            COUNT(e.employee_id) AS rated_employees,
-            ROUND(AVG(e.manager_rating), 2) AS average_rating
-        FROM employees e
-        LEFT JOIN departments d
-            ON e.department_id = d.department_id
-        WHERE e.manager_rating IS NOT NULL
-        GROUP BY
-            e.department_id,
-            d.department_name
-        ORDER BY average_rating DESC
-    """)
+    if department_id is None:
+
+        cursor.execute("""
+            SELECT
+                e.department_id,
+                d.department_name,
+                COUNT(e.employee_id) AS rated_employees,
+                ROUND(AVG(e.manager_rating), 2) AS average_rating
+            FROM employees e
+            LEFT JOIN departments d
+                ON e.department_id = d.department_id
+            WHERE e.manager_rating IS NOT NULL
+            GROUP BY
+                e.department_id,
+                d.department_name
+            ORDER BY average_rating DESC
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                e.department_id,
+                d.department_name,
+                COUNT(e.employee_id) AS rated_employees,
+                ROUND(AVG(e.manager_rating), 2) AS average_rating
+            FROM employees e
+            LEFT JOIN departments d
+                ON e.department_id = d.department_id
+            WHERE e.manager_rating IS NOT NULL
+            AND e.department_id = %s
+            GROUP BY
+                e.department_id,
+                d.department_name
+            ORDER BY average_rating DESC
+        """, (department_id,))
 
     departments = cursor.fetchall()
 
@@ -424,49 +638,96 @@ def get_performance_report_service():
 
     return {
         "summary": {
-            "rated_employees": summary["rated_employees"] or 0,
-            "average_rating": summary["average_rating"] or 0,
-            "highest_rating": summary["highest_rating"] or 0,
-            "lowest_rating": summary["lowest_rating"] or 0
+            "rated_employees": (
+                summary["rated_employees"] or 0
+            ),
+            "average_rating": (
+                summary["average_rating"] or 0
+            ),
+            "highest_rating": (
+                summary["highest_rating"] or 0
+            ),
+            "lowest_rating": (
+                summary["lowest_rating"] or 0
+            )
         },
         "department_statistics": departments
     }
 
 
-def get_salary_report_service():
+def get_salary_report_service(department_id=None):
 
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT
-            COUNT(base_salary) AS employees_with_salary,
-            ROUND(AVG(base_salary), 2) AS average_salary,
-            MIN(base_salary) AS minimum_salary,
-            MAX(base_salary) AS maximum_salary,
-            ROUND(SUM(base_salary), 2) AS total_salary
-        FROM employees
-        WHERE base_salary IS NOT NULL
-    """)
+    if department_id is None:
+
+        cursor.execute("""
+            SELECT
+                COUNT(base_salary) AS employees_with_salary,
+                ROUND(AVG(base_salary), 2) AS average_salary,
+                MIN(base_salary) AS minimum_salary,
+                MAX(base_salary) AS maximum_salary,
+                ROUND(SUM(base_salary), 2) AS total_salary
+            FROM employees
+            WHERE base_salary IS NOT NULL
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                COUNT(base_salary) AS employees_with_salary,
+                ROUND(AVG(base_salary), 2) AS average_salary,
+                MIN(base_salary) AS minimum_salary,
+                MAX(base_salary) AS maximum_salary,
+                ROUND(SUM(base_salary), 2) AS total_salary
+            FROM employees
+            WHERE base_salary IS NOT NULL
+            AND department_id = %s
+        """, (department_id,))
 
     summary = cursor.fetchone()
 
-    cursor.execute("""
-        SELECT
-            d.department_id,
-            d.department_name,
-            COUNT(e.employee_id) AS employees,
-            ROUND(AVG(e.base_salary), 2) AS average_salary,
-            MIN(e.base_salary) AS minimum_salary,
-            MAX(e.base_salary) AS maximum_salary
-        FROM employees e
-        LEFT JOIN departments d
-            ON e.department_id = d.department_id
-        WHERE e.base_salary IS NOT NULL
-        GROUP BY
-            d.department_id,
-            d.department_name
-        ORDER BY average_salary DESC
-    """)
+    if department_id is None:
+
+        cursor.execute("""
+            SELECT
+                d.department_id,
+                d.department_name,
+                COUNT(e.employee_id) AS employees,
+                ROUND(AVG(e.base_salary), 2) AS average_salary,
+                MIN(e.base_salary) AS minimum_salary,
+                MAX(e.base_salary) AS maximum_salary
+            FROM employees e
+            LEFT JOIN departments d
+                ON e.department_id = d.department_id
+            WHERE e.base_salary IS NOT NULL
+            GROUP BY
+                d.department_id,
+                d.department_name
+            ORDER BY average_salary DESC
+        """)
+
+    else:
+
+        cursor.execute("""
+            SELECT
+                d.department_id,
+                d.department_name,
+                COUNT(e.employee_id) AS employees,
+                ROUND(AVG(e.base_salary), 2) AS average_salary,
+                MIN(e.base_salary) AS minimum_salary,
+                MAX(e.base_salary) AS maximum_salary
+            FROM employees e
+            LEFT JOIN departments d
+                ON e.department_id = d.department_id
+            WHERE e.base_salary IS NOT NULL
+            AND e.department_id = %s
+            GROUP BY
+                d.department_id,
+                d.department_name
+            ORDER BY average_salary DESC
+        """, (department_id,))
 
     departments = cursor.fetchall()
 
@@ -477,10 +738,338 @@ def get_salary_report_service():
             "employees_with_salary": (
                 summary["employees_with_salary"] or 0
             ),
-            "average_salary": summary["average_salary"] or 0,
-            "minimum_salary": summary["minimum_salary"] or 0,
-            "maximum_salary": summary["maximum_salary"] or 0,
-            "total_salary": summary["total_salary"] or 0
+            "average_salary": (
+                summary["average_salary"] or 0
+            ),
+            "minimum_salary": (
+                summary["minimum_salary"] or 0
+            ),
+            "maximum_salary": (
+                summary["maximum_salary"] or 0
+            ),
+            "total_salary": (
+                summary["total_salary"] or 0
+            )
         },
         "department_statistics": departments
+    }
+
+
+def get_hr_department_id(current_user):
+
+    employee_id = current_user.get("employee_id")
+
+    if not employee_id:
+
+        raise HTTPException(
+            status_code=403,
+            detail="HR department information is unavailable"
+        )
+
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            employee_id,
+            department_id,
+            status
+        FROM employees
+        WHERE employee_id = %s
+    """, (employee_id,))
+
+    employee = cursor.fetchone()
+
+    cursor.close()
+
+    if employee is None:
+
+        raise HTTPException(
+            status_code=403,
+            detail="HR employee record not found"
+        )
+
+    if employee["status"] != "Active":
+
+        raise HTTPException(
+            status_code=403,
+            detail="HR account is inactive"
+        )
+
+    if employee["department_id"] is None:
+
+        raise HTTPException(
+            status_code=403,
+            detail="HR is not assigned to a department"
+        )
+
+    return employee["department_id"]
+
+def get_all_hr_service():
+
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            e.employee_id AS hr_id,
+            e.first_name,
+            e.last_name,
+            e.email,
+            e.phone,
+            e.gender,
+            e.joining_date,
+            e.designation,
+            e.base_salary,
+            e.status,
+            e.department_id,
+            d.department_name,
+            u.username,
+            u.status AS account_status
+        FROM employees e
+        INNER JOIN departments d
+            ON e.department_id = d.department_id
+        LEFT JOIN users u
+            ON e.employee_id = u.employee_id
+            AND u.role = 'HR'
+        WHERE e.employee_id LIKE 'HR%'
+        ORDER BY e.first_name ASC
+    """)
+
+    hr_list = cursor.fetchall()
+
+    cursor.close()
+
+    return {
+        "hr": hr_list,
+        "total": len(hr_list)
+    }
+
+def get_all_departments_service():
+
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            d.department_id,
+            d.department_name,
+            d.description,
+
+            COUNT(e.employee_id) AS total_employees,
+
+            SUM(
+                CASE
+                    WHEN e.status = 'Active' THEN 1
+                    ELSE 0
+                END
+            ) AS active_employees,
+
+            SUM(
+                CASE
+                    WHEN e.status = 'Resigned' THEN 1
+                    ELSE 0
+                END
+            ) AS resigned_employees
+
+        FROM departments d
+
+        LEFT JOIN employees e
+            ON d.department_id = e.department_id
+
+        GROUP BY
+            d.department_id,
+            d.department_name,
+            d.description
+
+        ORDER BY
+            d.department_name ASC
+    """)
+
+    departments = cursor.fetchall()
+
+    cursor.close()
+
+    for department in departments:
+
+        department["total_employees"] = (
+            department["total_employees"] or 0
+        )
+
+        department["active_employees"] = (
+            department["active_employees"] or 0
+        )
+
+        department["resigned_employees"] = (
+            department["resigned_employees"] or 0
+        )
+
+    return {
+        "departments": departments,
+        "total": len(departments)
+    }
+
+def add_department_service(department):
+
+    cursor = connection.cursor(dictionary=True)
+
+    department_name = department.department_name.strip()
+
+    if not department_name:
+        cursor.close()
+        return {
+            "message": "Department name is required"
+        }
+
+    cursor.execute("""
+        SELECT department_id
+        FROM departments
+        WHERE LOWER(department_name) = LOWER(%s)
+    """, (department_name,))
+
+    existing = cursor.fetchone()
+
+    if existing:
+        cursor.close()
+        return {
+            "message": "Department already exists"
+        }
+
+    cursor.execute("""
+        INSERT INTO departments (
+            department_name,
+            description
+        )
+        VALUES (%s, %s)
+    """, (
+        department_name,
+        department.description
+    ))
+
+    connection.commit()
+
+    department_id = cursor.lastrowid
+
+    cursor.close()
+
+    return {
+        "message": "Department added successfully",
+        "department_id": department_id,
+        "department_name": department_name
+    }
+
+
+def update_department_service(department_id: int, department):
+
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT department_id
+        FROM departments
+        WHERE department_id = %s
+    """, (department_id,))
+
+    existing = cursor.fetchone()
+
+    if not existing:
+        cursor.close()
+        return {
+            "message": "Department not found"
+        }
+
+    department_name = department.department_name.strip()
+
+    if not department_name:
+        cursor.close()
+        return {
+            "message": "Department name is required"
+        }
+
+    cursor.execute("""
+        SELECT department_id
+        FROM departments
+        WHERE LOWER(department_name) = LOWER(%s)
+        AND department_id != %s
+    """, (
+        department_name,
+        department_id
+    ))
+
+    duplicate = cursor.fetchone()
+
+    if duplicate:
+        cursor.close()
+        return {
+            "message": "Another department with this name already exists"
+        }
+
+    cursor.execute("""
+        UPDATE departments
+        SET
+            department_name = %s,
+            description = %s
+        WHERE department_id = %s
+    """, (
+        department_name,
+        department.description,
+        department_id
+    ))
+
+    connection.commit()
+
+    cursor.close()
+
+    return {
+        "message": "Department updated successfully",
+        "department_id": department_id,
+        "department_name": department_name
+    }
+
+
+def delete_department_service(department_id: int):
+
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            department_id,
+            department_name
+        FROM departments
+        WHERE department_id = %s
+    """, (department_id,))
+
+    department = cursor.fetchone()
+
+    if not department:
+        cursor.close()
+        return {
+            "message": "Department not found"
+        }
+
+    # Do not allow deletion if employees are assigned
+    cursor.execute("""
+        SELECT COUNT(*) AS employee_count
+        FROM employees
+        WHERE department_id = %s
+    """, (department_id,))
+
+    employee_count = cursor.fetchone()["employee_count"]
+
+    if employee_count > 0:
+        cursor.close()
+        return {
+            "message": "Department cannot be deleted because employees are assigned to it",
+            "employee_count": employee_count
+        }
+
+    cursor.execute("""
+        DELETE FROM departments
+        WHERE department_id = %s
+    """, (department_id,))
+
+    connection.commit()
+
+    cursor.close()
+
+    return {
+        "message": "Department deleted successfully",
+        "department_id": department_id,
+        "department_name": department["department_name"]
     }

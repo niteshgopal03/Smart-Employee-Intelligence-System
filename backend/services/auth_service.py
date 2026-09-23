@@ -9,26 +9,7 @@ from security.jwt_handler import create_access_token
 def login_service(user: UserLogin):
 
 
-    if (
-        user.username == "admin"
-        and user.password == "Admin@123"
-    ):
-
-        access_token = create_access_token(
-            {
-                "username": "admin",
-                "employee_id": "ADMIN001",
-                "role": "Admin"
-            }
-        )
-
-        return {
-            "message": "Login Successful",
-            "access_token": access_token,
-            "token_type": "Bearer",
-            "employee_id": "ADMIN001",
-            "role": "Admin"
-        }
+   
 
     # HR / Employee Login
 
@@ -83,13 +64,12 @@ def login_service(user: UserLogin):
 
     # Generate JWT
 
-    access_token = create_access_token(
-        {
-            "username": db_user["username"],
-            "employee_id": db_user["employee_id"],
-            "role": db_user["role"]
-        }
-    )
+    access_token = create_access_token({
+    "user_id": db_user["user_id"],
+    "username": db_user["username"],
+    "employee_id": db_user["employee_id"],
+    "role": db_user["role"]
+    })
 
     return {
         "message": "Login Successful",
