@@ -99,9 +99,8 @@ def show_hr_performance():
         unsafe_allow_html=True,
     )
 
-    # ---------------------------------------------------------
+    
     # Load employees
-    # ---------------------------------------------------------
 
     employees, error = api_request("GET", "/employees")
 
@@ -113,10 +112,9 @@ def show_hr_performance():
         st.info("No employees are available.")
         return
 
-    # ---------------------------------------------------------
+    
     # Employee selection
-    # ---------------------------------------------------------
-
+    
     section_header(
         "Select employee",
         "Choose an employee to view or update their manager rating.",
@@ -139,9 +137,9 @@ def show_hr_performance():
         st.error("Selected employee does not have a valid employee ID.")
         return
 
-    # ---------------------------------------------------------
+    
     # Employee information
-    # ---------------------------------------------------------
+    
 
     first_name = selected_employee.get("first_name", "")
     last_name = selected_employee.get("last_name", "")
@@ -171,9 +169,9 @@ def show_hr_performance():
 
     st.write("")
 
-    # ---------------------------------------------------------
+    
     # Load current performance
-    # ---------------------------------------------------------
+    
 
     performance, performance_error = api_request(
         "GET",
@@ -189,9 +187,8 @@ def show_hr_performance():
 
     current_rating = performance.get("manager_rating")
 
-    # ---------------------------------------------------------
+    
     # Current rating
-    # ---------------------------------------------------------
 
     rating_col1, rating_col2 = st.columns([1, 2])
 
@@ -231,10 +228,9 @@ def show_hr_performance():
 
     st.write("")
 
-    # ---------------------------------------------------------
+    
     # Update rating
-    # ---------------------------------------------------------
-
+    
     section_header(
         "Update performance rating",
         "Enter the latest manager assessment for this employee.",

@@ -18,11 +18,11 @@ def show_employee_dashboard():
 
     employee_id = st.session_state.get("employee_id")
 
-    # ---------------------------------------------------------
+   
     # Load real data from the backend.
     # Each call fails independently so one broken endpoint
     # doesn't take down the whole dashboard.
-    # ---------------------------------------------------------
+   
 
     percentage_data, percentage_error = api_request(
         "GET",

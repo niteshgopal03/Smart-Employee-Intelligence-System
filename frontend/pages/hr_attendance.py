@@ -8,16 +8,16 @@ from components.cards import metric_card, section_header
 
 
 def show_hr_attendance():
-    # ---------------------------------------------------------
+   
     # Page Header
-    # ---------------------------------------------------------
+   
     st.caption("HUMAN RESOURCES")
     st.title("Attendance Control")
     st.caption("Monitor and manage attendance records for your department.")
 
-    # ---------------------------------------------------------
+   
     # Load Attendance
-    # ---------------------------------------------------------
+   
     attendance, error = api_request("GET", "/attendance")
 
     if error:
@@ -31,9 +31,9 @@ def show_hr_attendance():
             else []
         )
 
-    # ---------------------------------------------------------
+   
     # Attendance Metrics
-    # ---------------------------------------------------------
+   
     total_records = len(attendance)
 
     present_count = sum(
@@ -96,9 +96,9 @@ def show_hr_attendance():
 
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Controls
-    # ---------------------------------------------------------
+   
     control1, control2, control3 = st.columns([2, 2, 1])
 
     with control1:
@@ -125,9 +125,9 @@ def show_hr_attendance():
             use_container_width=True,
         )
 
-    # ---------------------------------------------------------
+   
     # Mark Attendance
-    # ---------------------------------------------------------
+   
     if mark_clicked:
         st.session_state["show_mark_attendance"] = True
 
@@ -239,9 +239,9 @@ def show_hr_attendance():
 
         st.write("")
 
-    # ---------------------------------------------------------
+   
     # Filter Records
-    # ---------------------------------------------------------
+   
     section_header(
         "Attendance Records",
         f"Records for {calendar.month_name[selected_month]} {selected_year}",
@@ -295,9 +295,9 @@ def show_hr_attendance():
 
         filtered_records.append(record)
 
-    # ---------------------------------------------------------
+   
     # Records Table
-    # ---------------------------------------------------------
+   
     if not filtered_records:
         with st.container(border=True):
             st.info(
@@ -340,9 +340,9 @@ def show_hr_attendance():
             hide_index=True,
         )
 
-    # ---------------------------------------------------------
+   
     # Attendance Calendar
-    # ---------------------------------------------------------
+   
     st.write("")
 
     section_header(
@@ -393,9 +393,9 @@ def show_hr_attendance():
             hide_index=True,
         )
 
-    # ---------------------------------------------------------
+   
     # Update Attendance
-    # ---------------------------------------------------------
+   
     st.write("")
 
     section_header(

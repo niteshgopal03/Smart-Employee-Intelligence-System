@@ -94,9 +94,9 @@ def show_employee_performance():
         st.error("Employee information is missing from the current session.")
         return
 
-    # ---------------------------------------------------------
+   
     # Get own performance
-    # ---------------------------------------------------------
+   
 
     performance, error = api_request(
         "GET",
@@ -123,9 +123,9 @@ def show_employee_performance():
         st.error("The performance rating returned by the backend is invalid.")
         return
 
-    # ---------------------------------------------------------
+   
     # Score
-    # ---------------------------------------------------------
+   
 
     score_col, info_col = st.columns([1, 2])
 
@@ -168,9 +168,9 @@ def show_employee_performance():
 
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Rating scale
-    # ---------------------------------------------------------
+   
 
     section_header(
         "Rating scale",

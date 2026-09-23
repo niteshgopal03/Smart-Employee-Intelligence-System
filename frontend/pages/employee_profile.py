@@ -29,9 +29,9 @@ def show_employee_profile():
     if not full_name:
         full_name = "—"
 
-    # ---------------------------------------------------------
+   
     # Personal Information
-    # ---------------------------------------------------------
+   
 
     section_header(
         "Personal Information",
@@ -80,9 +80,9 @@ def show_employee_profile():
 
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Employment Information
-    # ---------------------------------------------------------
+   
 
     section_header(
         "Employment Information",
@@ -147,9 +147,9 @@ def show_employee_profile():
 
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Skills
-    # ---------------------------------------------------------
+   
 
     section_header(
         "Skills",
@@ -166,9 +166,9 @@ def show_employee_profile():
 
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Change Password
-    # ---------------------------------------------------------
+   
 
     section_header(
         "Account Security",

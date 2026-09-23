@@ -159,9 +159,7 @@ def show_hr_leave():
     approved = summary.get("approved", 0)
     rejected = summary.get("rejected", 0)
 
-    # ---------------------------------------------------------
     # Overview
-    # ---------------------------------------------------------
 
     cols = st.columns(4)
 
@@ -187,9 +185,7 @@ def show_hr_leave():
 
     st.write("")
 
-    # ---------------------------------------------------------
     # Filters
-    # ---------------------------------------------------------
 
     section_header(
         "Leave requests",
@@ -257,9 +253,8 @@ def show_hr_leave():
         st.info("No leave requests match the selected filters.")
         return
 
-    # ---------------------------------------------------------
     # Requests
-    # ---------------------------------------------------------
+
 
     for request in filtered_requests:
         leave_id = request.get("leave_id", "—")
@@ -366,9 +361,9 @@ def show_hr_leave():
                         "Pending requests can be approved or rejected."
                     )
 
-    # ---------------------------------------------------------
+    
     # Department summary
-    # ---------------------------------------------------------
+    
 
     st.write("")
     section_header(

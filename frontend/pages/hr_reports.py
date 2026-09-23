@@ -105,9 +105,9 @@ def show_hr_reports():
         unsafe_allow_html=True,
     )
 
-    # ---------------------------------------------------------
+   
     # Report selector
-    # ---------------------------------------------------------
+   
 
     report_type = st.selectbox(
         "Select report",
@@ -123,10 +123,9 @@ def show_hr_reports():
 
     st.write("")
 
-    # ---------------------------------------------------------
-    # Employee report
-    # ---------------------------------------------------------
 
+    # Employee report
+    
     if report_type == "Employee Overview":
         data = _get_report("/hr/reports/employees")
 
@@ -172,10 +171,9 @@ def show_hr_reports():
             use_container_width=True,
         )
 
-    # ---------------------------------------------------------
+    
     # Department report
-    # ---------------------------------------------------------
-
+    
     elif report_type == "Department Overview":
         data = _get_report("/hr/reports/departments")
 
@@ -232,9 +230,8 @@ def show_hr_reports():
                 use_container_width=True,
             )
 
-    # ---------------------------------------------------------
+    
     # Attendance report
-    # ---------------------------------------------------------
 
     elif report_type == "Attendance":
         data = _get_report("/hr/reports/attendance")
@@ -283,9 +280,8 @@ def show_hr_reports():
             use_container_width=True,
         )
 
-    # ---------------------------------------------------------
+    
     # Leave report
-    # ---------------------------------------------------------
 
     elif report_type == "Leave":
         data = _get_report("/hr/reports/leave")
@@ -340,9 +336,8 @@ def show_hr_reports():
             use_container_width=True,
         )
 
-    # ---------------------------------------------------------
+
     # Performance report
-    # ---------------------------------------------------------
 
     elif report_type == "Performance":
         data = _get_report("/hr/reports/performance")
@@ -393,9 +388,8 @@ def show_hr_reports():
             use_container_width=True,
         )
 
-    # ---------------------------------------------------------
+
     # Salary report
-    # ---------------------------------------------------------
 
     elif report_type == "Salary":
         data = _get_report("/hr/reports/salary")

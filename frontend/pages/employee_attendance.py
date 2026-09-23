@@ -13,9 +13,9 @@ def show_employee_attendance():
 
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Load Attendance Percentage
-    # ---------------------------------------------------------
+   
 
     percentage_data, percentage_error = api_request(
         "GET",
@@ -35,9 +35,9 @@ def show_employee_attendance():
             or 0
         )
 
-    # ---------------------------------------------------------
+   
     # Top Summary
-    # ---------------------------------------------------------
+   
 
     col1, col2, col3 = st.columns([1.3, 1, 1])
 
@@ -73,9 +73,9 @@ def show_employee_attendance():
     st.write("")
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Month Selector
-    # ---------------------------------------------------------
+   
 
     st.subheader("Monthly Attendance")
     st.caption("Select a month to view your detailed attendance.")
@@ -124,9 +124,9 @@ def show_employee_attendance():
 
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Monthly API
-    # ---------------------------------------------------------
+   
 
     attendance_data, attendance_error = api_request(
         "GET",
@@ -150,9 +150,9 @@ def show_employee_attendance():
     if not isinstance(records, list):
         records = []
 
-    # ---------------------------------------------------------
+   
     # Calculate Summary
-    # ---------------------------------------------------------
+   
 
     present_count = 0
     absent_count = 0
@@ -175,9 +175,9 @@ def show_employee_attendance():
 
     total_days = len(records)
 
-    # ---------------------------------------------------------
+   
     # Monthly Statistics
-    # ---------------------------------------------------------
+   
 
     st.subheader(
         f"{calendar.month_name[month]} {year}"
@@ -215,9 +215,9 @@ def show_employee_attendance():
 
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Attendance Records
-    # ---------------------------------------------------------
+   
 
     st.subheader("Attendance History")
 

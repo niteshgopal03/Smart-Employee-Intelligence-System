@@ -13,10 +13,9 @@ def show_hr_dashboard():
 
     st.write("")
 
-    # ==================================================
-    # LOAD HR REPORTS
-    # ==================================================
 
+    # LOAD HR REPORTS
+    
     employees_data, employees_error = api_request(
         "GET",
         "/hr/reports/employees"
@@ -47,9 +46,8 @@ def show_hr_dashboard():
         "/hr/reports/salary"
     )
 
-    # ==================================================
     # ERROR HANDLING
-    # ==================================================
+    
 
     api_errors = [
         ("Employees", employees_error),
@@ -73,9 +71,9 @@ def show_hr_dashboard():
         )
         return
 
-    # ==================================================
+    
     # NORMALIZE RESPONSES
-    # ==================================================
+    
 
     employees_data = (
         employees_data
@@ -113,15 +111,9 @@ def show_hr_dashboard():
         else {}
     )
 
-    # ==================================================
+    
     # EMPLOYEE REPORT
-    # Backend:
-    # {
-    #   total_employees,
-    #   active_employees,
-    #   resigned_employees
-    # }
-    # ==================================================
+    
 
     total_employees = (
         employees_data.get("total_employees") or 0
@@ -135,14 +127,9 @@ def show_hr_dashboard():
         employees_data.get("resigned_employees") or 0
     )
 
-    # ==================================================
+    
     # DEPARTMENT REPORT
-    # Backend:
-    # {
-    #   departments: [...]
-    # }
-    # ==================================================
-
+    
     departments = departments_data.get(
         "departments",
         []
@@ -153,17 +140,9 @@ def show_hr_dashboard():
 
     total_departments = len(departments)
 
-    # ==================================================
+    
     # ATTENDANCE REPORT
-    # Backend:
-    # {
-    #   total_records,
-    #   present,
-    #   absent,
-    #   leave,
-    #   attendance_percentage
-    # }
-    # ==================================================
+    
 
     total_attendance = (
         attendance_data.get("total_records") or 0
@@ -185,17 +164,9 @@ def show_hr_dashboard():
         attendance_data.get("attendance_percentage") or 0
     )
 
-    # ==================================================
+    
     # LEAVE REPORT
-    # Backend:
-    # {
-    #   total_requests,
-    #   pending,
-    #   approved,
-    #   rejected,
-    #   approved_leave_days
-    # }
-    # ==================================================
+
 
     total_leave = (
         leave_data.get("total_requests") or 0
@@ -217,19 +188,9 @@ def show_hr_dashboard():
         leave_data.get("approved_leave_days") or 0
     )
 
-    # ==================================================
-    # PERFORMANCE REPORT
-    # Backend:
-    # {
-    #   summary: {
-    #       rated_employees,
-    #       average_rating,
-    #       highest_rating,
-    #       lowest_rating
-    #   },
-    #   department_statistics: [...]
-    # }
-    # ==================================================
+    
+    
+    
 
     performance_summary = performance_data.get(
         "summary",
@@ -255,20 +216,7 @@ def show_hr_dashboard():
         performance_summary.get("lowest_rating") or 0
     )
 
-    # ==================================================
-    # SALARY REPORT
-    # Backend:
-    # {
-    #   summary: {
-    #       employees_with_salary,
-    #       average_salary,
-    #       minimum_salary,
-    #       maximum_salary,
-    #       total_salary
-    #   },
-    #   department_statistics: [...]
-    # }
-    # ==================================================
+    
 
     salary_summary = salary_data.get(
         "summary",
@@ -298,9 +246,9 @@ def show_hr_dashboard():
         salary_summary.get("maximum_salary") or 0
     )
 
-    # ==================================================
+    
     # HERO SECTION
-    # ==================================================
+    
 
     with st.container(border=True):
 
@@ -346,9 +294,9 @@ def show_hr_dashboard():
     st.write("")
     st.write("")
 
-    # ==================================================
+    
     # WORKFORCE SNAPSHOT
-    # ==================================================
+    
 
     st.subheader("Workforce Snapshot")
 
@@ -428,9 +376,9 @@ def show_hr_dashboard():
     st.write("")
     st.write("")
 
-    # ==================================================
+    
     # ATTENDANCE + LEAVE
-    # ==================================================
+    
 
     left, right = st.columns(2)
 
@@ -513,9 +461,9 @@ def show_hr_dashboard():
     st.write("")
     st.write("")
 
-    # ==================================================
+    
     # PERFORMANCE OVERVIEW
-    # ==================================================
+    
 
     st.subheader("📈 Performance Overview")
 
@@ -571,9 +519,9 @@ def show_hr_dashboard():
     st.write("")
     st.write("")
 
-    # ==================================================
+    
     # SALARY OVERVIEW
-    # ==================================================
+    
 
     st.subheader("💰 Compensation Overview")
 
@@ -629,9 +577,9 @@ def show_hr_dashboard():
     st.write("")
     st.write("")
 
-    # ==================================================
+    
     # ORGANIZATION OVERVIEW
-    # ==================================================
+    
 
     st.subheader("🏢 Organization Overview")
 
@@ -686,9 +634,8 @@ def show_hr_dashboard():
     st.write("")
     st.write("")
 
-    # ==================================================
     # DEPARTMENT OVERVIEW
-    # ==================================================
+    
 
     st.subheader("🏢 Department Overview")
 
@@ -744,10 +691,9 @@ def show_hr_dashboard():
     st.write("")
     st.write("")
 
-    # ==================================================
+    
     # QUICK ACTIONS
-    # ==================================================
-
+    
     st.subheader("⚡ HR Actions")
 
     st.caption(

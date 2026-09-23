@@ -12,7 +12,7 @@ def show_login_page():
     with header_center:
         st.markdown(
             "<div style='text-align: center;'>"
-            "<h1>👥 Smart Employee Intelligence</h1>"
+            "<h1>👥 Smart Employee Intelligence System</h1>"
             "<p style='color: #6b7280; font-size: 16px;'>"
             "Employee Management & Intelligence Platform"
             "</p>"

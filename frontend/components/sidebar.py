@@ -24,9 +24,7 @@ def show_sidebar(role):
 
         st.caption("NAVIGATION")
 
-        # If a Quick Action button elsewhere set a target page,
-        # apply it to the relevant radio's state before that radio
-        # is instantiated below, then consume it so it only fires once.
+        
         nav_target = st.session_state.pop("nav_target", None)
 
         if role == "Employee":

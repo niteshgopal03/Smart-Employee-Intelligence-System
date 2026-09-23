@@ -70,17 +70,21 @@ def apply_global_styles():
             color: #38bdf8 !important;
         }
 
-        /* Keep the anchor-link icon hidden until hover, as normal */
-        [data-testid="stHeaderActionElements"] {
-            opacity: 0;
-            transition: opacity 0.15s ease;
-        }
-
-        h1:hover [data-testid="stHeaderActionElements"],
-        h2:hover [data-testid="stHeaderActionElements"],
-        h3:hover [data-testid="stHeaderActionElements"],
-        [data-testid="stHeaderActionElements"]:hover {
-            opacity: 1;
+        /* Permanently hide Streamlit's heading anchor-link icon.
+           Different Streamlit versions render this with different
+           markup, so several selectors are covered here rather than
+           relying on hover-to-reveal, which wasn't taking effect. */
+        [data-testid="stHeaderActionElements"],
+        [data-testid="stElementToolbar"],
+        .stMarkdown h1 a,
+        .stMarkdown h2 a,
+        .stMarkdown h3 a,
+        .stMarkdown h4 a,
+        h1 > a,
+        h2 > a,
+        h3 > a,
+        h4 > a {
+            display: none !important;
         }
 
         [data-testid="stCaptionContainer"] {

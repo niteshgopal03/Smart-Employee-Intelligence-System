@@ -25,9 +25,9 @@ def mark_attendance_service(attendance, department_id=None):
 
     cursor = connection.cursor(dictionary=True)
 
-    # ---------------------------------------------------------
+    
     # Check employee exists
-    # ---------------------------------------------------------
+    
     cursor.execute("""
         SELECT employee_id, status, department_id
         FROM employees
@@ -42,9 +42,9 @@ def mark_attendance_service(attendance, department_id=None):
             "message": "Employee not found"
         }
 
-    # ---------------------------------------------------------
+    
     # HR department restriction
-    # ---------------------------------------------------------
+    
     if (
         department_id is not None
         and employee["department_id"] != department_id
@@ -60,9 +60,9 @@ def mark_attendance_service(attendance, department_id=None):
             "message": "Cannot mark attendance for a resigned employee"
         }
 
-    # ---------------------------------------------------------
+    
     # Check duplicate attendance
-    # ---------------------------------------------------------
+    
     cursor.execute("""
         SELECT attendance_id
         FROM attendance
@@ -81,9 +81,9 @@ def mark_attendance_service(attendance, department_id=None):
             "message": "Attendance already exists for this date"
         }
 
-    # ---------------------------------------------------------
+    
     # Insert attendance
-    # ---------------------------------------------------------
+    
     cursor.execute("""
         INSERT INTO attendance (
             employee_id,
@@ -120,9 +120,9 @@ def update_attendance_service(
 
     cursor = connection.cursor(dictionary=True)
 
-    # ---------------------------------------------------------
-    # Get existing attendance + employee department
-    # ---------------------------------------------------------
+    
+    # Get existing attendance and employee department
+    
     cursor.execute("""
         SELECT
             a.attendance_id,
@@ -142,9 +142,9 @@ def update_attendance_service(
             "message": "Attendance record not found"
         }
 
-    # ---------------------------------------------------------
+   
     # HR department restriction
-    # ---------------------------------------------------------
+    
     if (
         department_id is not None
         and existing["department_id"] != department_id
@@ -154,9 +154,7 @@ def update_attendance_service(
             "message": "You can only manage attendance for your department"
         }
 
-    # ---------------------------------------------------------
-    # Update attendance
-    # ---------------------------------------------------------
+   
     cursor.execute("""
         UPDATE attendance
         SET
@@ -189,9 +187,7 @@ def get_employee_attendance_service(
 
     cursor = connection.cursor(dictionary=True)
 
-    # ---------------------------------------------------------
-    # HR department restriction
-    # ---------------------------------------------------------
+    
     if department_id is not None:
 
         cursor.execute("""
@@ -210,9 +206,9 @@ def get_employee_attendance_service(
             cursor.close()
             return []
 
-    # ---------------------------------------------------------
+    
     # Get attendance
-    # ---------------------------------------------------------
+    
     cursor.execute("""
         SELECT
             attendance_id,
@@ -247,10 +243,7 @@ def get_all_attendance_service(department_id=None):
 
     cursor = connection.cursor(dictionary=True)
 
-    # ---------------------------------------------------------
-    # Admin: all attendance
-    # HR: own department only
-    # ---------------------------------------------------------
+    
     if department_id is None:
 
         cursor.execute("""
@@ -314,9 +307,7 @@ def get_attendance_percentage_service(
 
     cursor = connection.cursor(dictionary=True)
 
-    # ---------------------------------------------------------
-    # HR department restriction
-    # ---------------------------------------------------------
+    
     if department_id is not None:
 
         cursor.execute("""
@@ -337,9 +328,9 @@ def get_attendance_percentage_service(
                 "message": "Employee not found in your department"
             }
 
-    # ---------------------------------------------------------
+    
     # Calculate percentage
-    # ---------------------------------------------------------
+    
     cursor.execute("""
         SELECT
             COUNT(*) AS total_days,
@@ -465,9 +456,9 @@ def get_attendance_dashboard_service(
 
     cursor = connection.cursor(dictionary=True)
 
-    # ---------------------------------------------------------
+    
     # Overall summary
-    # ---------------------------------------------------------
+    
     if department_id is None:
 
         cursor.execute("""
@@ -525,9 +516,9 @@ def get_attendance_dashboard_service(
 
     summary = cursor.fetchone()
 
-    # ---------------------------------------------------------
+    
     # Employee-wise attendance
-    # ---------------------------------------------------------
+    
     if department_id is None:
 
         cursor.execute("""

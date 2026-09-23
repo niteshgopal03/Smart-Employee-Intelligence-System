@@ -32,9 +32,7 @@ def show_admin_dashboard():
     users = data.get("user_overview") or {}
     salary = data.get("salary_overview") or {}
 
-    # =========================================================
-    # PLATFORM SNAPSHOT
-    # =========================================================
+    
 
     st.markdown("### Platform Snapshot")
 
@@ -74,9 +72,9 @@ def show_admin_dashboard():
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
 
-    # =========================================================
+    
     # EMPLOYEE STATUS
-    # =========================================================
+   
 
     with st.container(border=True):
 
@@ -105,16 +103,13 @@ def show_admin_dashboard():
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
 
-    # =========================================================
+    
     # ATTENDANCE + LEAVE
-    # =========================================================
 
     left, right = st.columns(2)
 
-    # ---------------------------------------------------------
+   
     # ATTENDANCE
-    # ---------------------------------------------------------
-
     with left:
 
         with st.container(border=True):
@@ -160,10 +155,9 @@ def show_admin_dashboard():
                     "No attendance records available for today."
                 )
 
-    # ---------------------------------------------------------
+    
     # LEAVE
-    # ---------------------------------------------------------
-
+    
     with right:
 
         with st.container(border=True):
@@ -209,16 +203,14 @@ def show_admin_dashboard():
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
 
-    # =========================================================
+    
     # USERS + SALARY
-    # =========================================================
 
     left, right = st.columns(2)
 
-    # ---------------------------------------------------------
+   
     # USER ACCOUNTS
-    # ---------------------------------------------------------
-
+   
     with left:
 
         with st.container(border=True):
@@ -263,9 +255,9 @@ def show_admin_dashboard():
                 f"Total system accounts: {total_users}"
             )
 
-    # ---------------------------------------------------------
+    
     # SALARY
-    # ---------------------------------------------------------
+    
 
     with right:
 
@@ -309,9 +301,9 @@ def show_admin_dashboard():
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
 
-    # =========================================================
+    
     # DEPARTMENT ANALYTICS
-    # =========================================================
+   
 
     st.markdown("### 🏢 Department Analytics")
     st.caption("Employee distribution across organizational departments.")
@@ -370,9 +362,7 @@ def show_admin_dashboard():
             "No department information available."
         )
 
-    # =========================================================
-    # REFRESH
-    # =========================================================
+   
 
     st.markdown("<div style='height:22px'></div>", unsafe_allow_html=True)
 

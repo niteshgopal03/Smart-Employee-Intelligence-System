@@ -16,9 +16,9 @@ def show_admin_hr():
 
     hr_list = data.get("hr", []) if isinstance(data, dict) else []
 
-    # ---------------------------------------------------------
+   
     # TOP METRICS
-    # ---------------------------------------------------------
+   
     total_hr = len(hr_list)
 
     active_hr = sum(
@@ -42,9 +42,9 @@ def show_admin_hr():
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # ---------------------------------------------------------
+   
     # ADD HR BUTTON
-    # ---------------------------------------------------------
+   
     col_left, col_right = st.columns([4, 1])
 
     with col_left:
@@ -58,9 +58,9 @@ def show_admin_hr():
             type="primary",
         )
 
-    # ---------------------------------------------------------
+   
     # ADD HR FORM
-    # ---------------------------------------------------------
+   
     if add_hr:
         st.session_state["show_add_hr"] = True
 
@@ -242,9 +242,9 @@ def show_admin_hr():
                 st.session_state["show_add_hr"] = False
                 st.rerun()
 
-    # ---------------------------------------------------------
+   
     # HR TABLE
-    # ---------------------------------------------------------
+   
     st.markdown("---")
 
     if not hr_list:

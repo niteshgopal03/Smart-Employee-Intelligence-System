@@ -25,6 +25,14 @@ def show_admin_departments():
         if isinstance(data, dict)
         else []
     )
+    departments = sorted(
+    departments,
+    key=lambda department: (
+        department.get("department_id")
+        if department.get("department_id") is not None
+        else 0
+    ),
+)
 
     
     # METRICS

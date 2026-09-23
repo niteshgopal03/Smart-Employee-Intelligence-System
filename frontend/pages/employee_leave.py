@@ -10,9 +10,9 @@ def show_employee_leave():
 
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Load Leave Data
-    # ---------------------------------------------------------
+   
 
     data, error = api_request(
         "GET",
@@ -37,9 +37,9 @@ def show_employee_leave():
     if not isinstance(records, list):
         records = []
 
-    # ---------------------------------------------------------
+   
     # Calculate Leave Summary
-    # ---------------------------------------------------------
+   
 
     total_requests = len(records)
     pending = 0
@@ -73,9 +73,9 @@ def show_employee_leave():
         elif status == "rejected":
             rejected += 1
 
-    # ---------------------------------------------------------
+   
     # Leave Overview
-    # ---------------------------------------------------------
+   
 
     st.subheader("Leave Overview")
 
@@ -108,9 +108,9 @@ def show_employee_leave():
     st.write("")
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Apply for Leave
-    # ---------------------------------------------------------
+   
 
     st.subheader("Request Leave")
     st.caption("Submit a new leave request.")
@@ -192,9 +192,9 @@ def show_employee_leave():
     st.write("")
     st.write("")
 
-    # ---------------------------------------------------------
+   
     # Leave History
-    # ---------------------------------------------------------
+   
 
     st.subheader("Leave History")
     st.caption("Review your previously submitted leave requests.")

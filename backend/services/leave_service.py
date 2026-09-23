@@ -211,10 +211,10 @@ def approve_leave_service(
 
     try:
 
-        # -----------------------------------------------------
+        
         # Get leave request
-        # HR can only access their department
-        # -----------------------------------------------------
+        
+        
         if department_id is None:
 
             cursor.execute(
@@ -274,9 +274,9 @@ def approve_leave_service(
             leave["to_date"]
         )
 
-        # -----------------------------------------------------
+        
         # Lock employee row
-        # -----------------------------------------------------
+       
         cursor.execute(
             """
             SELECT
@@ -300,9 +300,7 @@ def approve_leave_service(
 
         current_balance = employee["leave_balance"] or 0
 
-        # -----------------------------------------------------
-        # Check balance
-        # -----------------------------------------------------
+        
         if current_balance < leave_days:
 
             connection.rollback()
@@ -315,9 +313,9 @@ def approve_leave_service(
                 "available_days": current_balance
             }
 
-        # -----------------------------------------------------
+        
         # Approve leave
-        # -----------------------------------------------------
+        
         cursor.execute(
             """
             UPDATE leave_requests
@@ -327,9 +325,9 @@ def approve_leave_service(
             (leave_id,)
         )
 
-        # -----------------------------------------------------
+        
         # Deduct leave balance
-        # -----------------------------------------------------
+        
         cursor.execute(
             """
             UPDATE employees
@@ -371,9 +369,9 @@ def reject_leave_service(
 
     cursor = connection.cursor(dictionary=True)
 
-    # ---------------------------------------------------------
+    
     # Find leave request
-    # ---------------------------------------------------------
+    
     if department_id is None:
 
         cursor.execute(
@@ -496,9 +494,9 @@ def get_leave_dashboard_service(
 
     cursor = connection.cursor(dictionary=True)
 
-    # ---------------------------------------------------------
+    
     # Summary
-    # ---------------------------------------------------------
+    
     if department_id is None:
 
         cursor.execute(
@@ -561,9 +559,9 @@ def get_leave_dashboard_service(
 
     summary = cursor.fetchone()
 
-    # ---------------------------------------------------------
+    
     # Leave requests
-    # ---------------------------------------------------------
+
     if department_id is None:
 
         cursor.execute(

@@ -5,17 +5,13 @@ from components.cards import metric_card, section_header
 
 
 def show_hr_employees():
-    # ---------------------------------------------------------
-    # Page Header
-    # ---------------------------------------------------------
+    
     st.title("Employee Directory")
     st.caption("HUMAN RESOURCES")
     st.write("Manage employees within your department.")
     st.divider()
 
-    # ---------------------------------------------------------
-    # Load Employees
-    # ---------------------------------------------------------
+    
     employees, error = api_request("GET", "/employees")
 
     if error:
@@ -25,9 +21,9 @@ def show_hr_employees():
     if not isinstance(employees, list):
         employees = employees.get("employees", []) if isinstance(employees, dict) else []
 
-    # ---------------------------------------------------------
+    
     # Workforce Metrics
-    # ---------------------------------------------------------
+    
     total_employees = len(employees)
 
     active_employees = sum(
@@ -81,9 +77,9 @@ def show_hr_employees():
 
     st.write("")
 
-    # ---------------------------------------------------------
+    
     # Search + Add
-    # ---------------------------------------------------------
+    
     left, right = st.columns([4, 1])
 
     with left:
@@ -100,9 +96,9 @@ def show_hr_employees():
             use_container_width=True,
         )
 
-    # ---------------------------------------------------------
+    
     # Add Employee Form
-    # ---------------------------------------------------------
+    
     if add_clicked:
         st.session_state["show_hr_add_employee"] = True
 
@@ -219,9 +215,9 @@ def show_hr_employees():
 
         st.write("")
 
-    # ---------------------------------------------------------
+    
     # Search Filtering
-    # ---------------------------------------------------------
+    
     if search_text.strip():
         search_response, search_error = api_request(
             "GET",
@@ -234,9 +230,9 @@ def show_hr_employees():
         elif not search_error and isinstance(search_response, dict):
             employees = search_response.get("employees", [])
 
-    # ---------------------------------------------------------
+    
     # Employee Directory
-    # ---------------------------------------------------------
+    
     section_header(
         "Employee Directory",
         f"{len(employees)} employee(s) visible in your department.",
@@ -247,9 +243,9 @@ def show_hr_employees():
             st.info("No employees found.")
         return
 
-    # ---------------------------------------------------------
+   
     # Employee Cards
-    # ---------------------------------------------------------
+    
     for employee in employees:
 
         employee_id = employee.get("employee_id", "—")
@@ -312,9 +308,9 @@ def show_hr_employees():
                 [1, 1, 1, 3]
             )
 
-            # -------------------------------------------------
+            
             # View
-            # -------------------------------------------------
+            
             with action1:
                 if st.button(
                     "👁️ View",
@@ -323,9 +319,9 @@ def show_hr_employees():
                 ):
                     st.session_state["selected_employee"] = employee_id
 
-            # -------------------------------------------------
+            
             # Edit
-            # -------------------------------------------------
+            
             with action2:
                 if st.button(
                     "✏️ Edit",
@@ -334,9 +330,8 @@ def show_hr_employees():
                 ):
                     st.session_state["edit_employee"] = employee_id
 
-            # -------------------------------------------------
             # Delete
-            # -------------------------------------------------
+           
             with action3:
                 if st.button(
                     "🗑️ Delete",
@@ -345,9 +340,9 @@ def show_hr_employees():
                 ):
                     st.session_state["delete_employee"] = employee_id
 
-    # ---------------------------------------------------------
+    
     # View Employee
-    # ---------------------------------------------------------
+    
     selected_employee = st.session_state.get("selected_employee")
 
     if selected_employee:
@@ -422,9 +417,9 @@ def show_hr_employees():
                     st.session_state["selected_employee"] = None
                     st.rerun()
 
-    # ---------------------------------------------------------
+    
     # Delete Confirmation
-    # ---------------------------------------------------------
+    
     delete_employee = st.session_state.get("delete_employee")
 
     if delete_employee:
@@ -468,9 +463,9 @@ def show_hr_employees():
                     st.session_state["delete_employee"] = None
                     st.rerun()
 
-    # ---------------------------------------------------------
+    
     # Edit Employee
-    # ---------------------------------------------------------
+    
     edit_employee = st.session_state.get("edit_employee")
 
     if edit_employee:
