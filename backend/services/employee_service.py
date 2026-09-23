@@ -387,9 +387,8 @@ def get_my_employee_service(employee_id: str):
     return employee
 
 
-def search_employees_service(
-    search: str,
-    hr_department_id=None
+def search_employees_service(search: str,hr_department_id=None,
+    exclude_employee_id=None
 ):
 
     cursor = connection.cursor(dictionary=True)
@@ -426,31 +425,33 @@ def search_employees_service(
     else:
 
         cursor.execute("""
-            SELECT
-                employee_id,
-                first_name,
-                last_name,
-                email,
-                phone,
-                department_id,
-                designation,
-                status
-            FROM employees
-            WHERE department_id = %s
-            AND (
-                employee_id LIKE %s
-                OR first_name LIKE %s
-                OR last_name LIKE %s
-                OR email LIKE %s
-            )
-            ORDER BY first_name ASC, last_name ASC
-        """, (
-            hr_department_id,
-            search_value,
-            search_value,
-            search_value
-        ))
-
+                       SELECT
+                       employee_id,
+                       first_name,
+                       last_name,
+                       email,
+                       phone,
+                       department_id,
+                       designation,
+                        status
+        FROM employees
+        WHERE department_id = %s
+        AND employee_id != %s
+        AND (
+            employee_id LIKE %s
+            OR first_name LIKE %s
+            OR last_name LIKE %s
+            OR email LIKE %s
+        )
+        ORDER BY first_name ASC, last_name ASC
+    """, (
+        hr_department_id,
+        exclude_employee_id,
+        search_value,
+        search_value,
+        search_value,
+        search_value
+    ))
     employees = cursor.fetchall()
 
     cursor.close()

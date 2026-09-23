@@ -56,7 +56,7 @@ def show_sidebar(role):
                 "Employees",
                 "Attendance",
                 "Leave","Performance",
-                "Reports","Change Password"
+                "Reports","AI Prediction","Change Password"
             ]
 
             if nav_target in options:

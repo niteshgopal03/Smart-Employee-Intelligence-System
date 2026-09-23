@@ -60,9 +60,10 @@ def search_employees(
         hr_department_id = get_hr_department_id(current_user)
 
     return search_employees_service(
-        search,
-        hr_department_id=hr_department_id
-    )
+    search=search,
+    hr_department_id=hr_department_id,
+    exclude_employee_id=current_user.get("employee_id")
+)
 
 
 @router.get("/employee/me")

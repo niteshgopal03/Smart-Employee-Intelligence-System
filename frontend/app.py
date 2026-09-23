@@ -118,6 +118,9 @@ elif role == "HR":
     elif page == "Reports":
         from pages.hr_reports import show_hr_reports
         show_hr_reports()
+    elif page == "AI Prediction":
+        from pages.hr_ai_prediction import show_hr_ai_prediction
+        show_hr_ai_prediction()
     elif page == "Change Password":
         show_change_password()
 
